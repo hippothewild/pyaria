@@ -31,15 +31,11 @@ def ARIA_encryption(plain, key, bits):
     if bits not in [128, 192, 256]:
         print("Key length must be 128/192/256bits!")
         return
-    plain_len = len(hex(plain)[2:-1])
-    if hex(plain)[-1].isdigit():
-        plain_len += 1
+    plain_len = len(hex(plain)[2:])
     if  plain_len > 32:
         print("Plain text should be 128bits!")
         return
-    key_len = len(hex(key)[2:-1])
-    if hex(key)[-1].isdigit():
-        key_len += 1
+    key_len = len(hex(key)[2:])
     if key_len > bits//4:
         print("Key should be {0:}bits!".format(bits))
         return
@@ -49,24 +45,20 @@ def ARIA_encryption(plain, key, bits):
     byte_cipher = cipher(byte_plain, byte_roundkeys, printIntermediate)
     return byte_to_int(byte_cipher)
 
-def ARIA_decryption(cipher, key, bits):
+def ARIA_decryption(c, key, bits):
     if bits not in [128, 192, 256]:
         print("Key length must be 128/192/256bits!")
         return
-    plain_len = len(hex(plain)[2:-1])
-    if hex(plain)[-1].isdigit():
-        plain_len += 1
-    if  plain_len > 32:
-        print("Plain text should be 128bits!")
+    c_len = len(hex(c)[2:])
+    if  c_len > 32:
+        print("Cipher text should be 128bits!")
         return
-    key_len = len(hex(key)[2:-1])
-    if hex(key)[-1].isdigit():
-        key_len += 1
+    key_len = len(hex(key)[2:])
     if key_len > bits//4:
         print("Key should be {0:}bits!".format(bits))
         return
-    byte_cipher = int_to_byte(cipher, 16)
+    byte_c = int_to_byte(c, 16)
     byte_key = int_to_byte(key, bits//8)
     byte_roundkeys = DecKeyExpansion(byte_key)
-    byte_plain = cipher(byte_cipher, byte_roundkeys, printIntermediate)
+    byte_plain = cipher(byte_c, byte_roundkeys, printIntermediate)
     return byte_to_int(byte_plain)
