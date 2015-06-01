@@ -1,9 +1,11 @@
 from flask import Flask
+from crossdomain import Crossdomain
 import ARIA
 
 app = Flask(__name__)
 
 @app.route('/encrypt/<string:hex_plain>/<int:key>/<int:bits>/')
+@Crossdomain(origin='*')
 def encrypt(hex_plain, key, bits):
     if len(hex_plain) % 32: # hex_plain length is not divisible by 32
         hex_plain += '0' * (32 - len(hex_plain) % 32)
@@ -13,6 +15,7 @@ def encrypt(hex_plain, key, bits):
     return result
 
 @app.route('/decrypt/<string:hex_cipher>/<int:key>/<int:bits>/')
+@Crossdomain(origin='*')
 def decrypt(hex_cipher, key, bits):
     if len(hex_cipher) % 32: # hex_cipher length is not divisible by 32
         hex_cipher += '0' * (32 - len(hex_cipher) % 32)
