@@ -212,7 +212,7 @@ def cipher(plain, roundkeys):
             t[ 4*j+3 ] = inv_S2box( roundkeys[ 2*i ][ 4*j+3 ] ^ c[ 4*j+3 ] )
         c = DiffLayer(t)
         if printIntermediate:
-            print(" Round {0:0>2}: ".format(2*i+1), end='')
+            print(" Round {0:0>2}: ".format(2*i+1),) #end='')
             printBlock(c)
         for j in range(4):
             t[ 4*j   ] = inv_S1box( roundkeys[ 2*i+1 ][ 4*j   ] ^ c[ 4*j   ] )
@@ -221,7 +221,7 @@ def cipher(plain, roundkeys):
             t[ 4*j+3 ] = S2box( roundkeys[ 2*i+1 ][ 4*j+3 ] ^ c[ 4*j+3 ] )
         c = DiffLayer(t)
         if 2*i+1 != R-1 and printIntermediate:
-            print(" Round {0:0>2}: ".format(2*i+2), end='')
+            print(" Round {0:0>2}: ".format(2*i+2),)# end='')
             printBlock(c)
     t = DiffLayer(c)
     for j in range(16):
@@ -230,8 +230,8 @@ def cipher(plain, roundkeys):
 
 def printBlock(s, end='\n'):
     for i in range(16):
-        print("0"*[0,1][s[i]<16]+hex(s[i])[2:], end=' ')
-    print(end, end='')
+        print("0"*[0,1][s[i]<16]+hex(s[i])[2:],)# end=' ')
+    print(end,)# end='')
 
 def main():
     #key = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff]
@@ -241,21 +241,21 @@ def main():
     roundkeys = KeyExpansion(key)
     print("Round Key (Encrypt):")
     for i in range(len(roundkeys)):
-        print(" Round {0:0>2}: ".format(i+1), end = '')
+        print(" Round {0:0>2}: ".format(i+1),)# end = '')
         printBlock(roundkeys[i])
     print("Encryption Starts:")
     c = cipher(plain, roundkeys)
-    print("Cipher Text: ", end='')
+    print("Cipher Text: ",)# end='')
     printBlock(c)
     print()
     roundkeys = DecKeyExpansion(key)
     print("Round Key (Decrypt):")
     for i in range(len(roundkeys)):
-        print(" Round {0:0>2}: ".format(i+1), end = '')
+        print(" Round {0:0>2}: ".format(i+1),)# end = '')
         printBlock(roundkeys[i])
     print("Decryption Starts:")
     p = cipher(c, roundkeys)
-    print("Plain Text: ", end='')
+    print("Plain Text: ",)# end='')
     printBlock(p)
     
 
