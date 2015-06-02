@@ -2,6 +2,25 @@
 ## Caution! This package is NOT compatible with Python 2.x
 ARIA implementation with Python
 
+**How to Install**
+ 1. Download *setup.py* and *ARIA* folder.
+ 2. Open a terminal, move to the directory that files are downloaded and run
+```
+$ python setup.py install
+```
+ - Shortcut version for Windows Users
+  1. Download a *PyARIA-1.0.0.win32.exe*.
+  2. Run the *PyARIA-1.0.0.win32.exe*.
+
+**How to Use**
+```Python
+import ARIA
+```
+or
+```Python
+from ARIA import *
+```
+
 **APIs**
 
  - ARIA_encryption(plain, key, bits)
