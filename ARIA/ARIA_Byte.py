@@ -224,11 +224,13 @@ def cipher(plain, roundkeys, printInter):
     t = DiffLayer(c)
     for j in range(16):
         c[j] = roundkeys[ len(roundkeys)-1 ][j] ^ t[j]
+    print(" Round {0:0>2}: ".format(2*i+2), end='')
+    printBlock(c)
     return c
 
 def printBlock(s, end='\n'):
-    for i in range(16):
-        print("0"*[0,1][s[i]<16]+hex(s[i])[2:], end=' ')
+    for byte in s:
+        print("0"*[0,1][byte<16]+hex(byte)[2:], end=' ')
     print(end, end='')
 
 def main():
@@ -236,20 +238,34 @@ def main():
     #key = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77]
     #key = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff]
     plain = [0x11, 0x11, 0x11, 0x11, 0xaa, 0xaa, 0xaa, 0xaa, 0x11, 0x11, 0x11, 0x11, 0xbb, 0xbb, 0xbb, 0xbb]
+    print("Key: ", end='')
+    printBlock(key)
+    print("Plain Text: ", end='')
+    printBlock(plain)
     roundkeys = KeyExpansion(key)
-    print("Round Key (Encrypt):")
+    print("Round Keys (Encrypt):")
     for i in range(len(roundkeys)):
-        print(" Round {0:0>2}: ".format(i+1), end = '')
+        if i != len(roundkeys) - 1:
+            print(" Round {0:0>2}: ".format(i+1), end='')
+        else:
+            print("         : ", end='')
         printBlock(roundkeys[i])
     print("Encryption Starts:")
     c = cipher(plain, roundkeys, True)
     print("Cipher Text: ", end='')
     printBlock(c)
     print()
+    print("Key: ", end='')
+    printBlock(key)
+    print("Cipher Text: ", end='')
+    printBlock(c)
     roundkeys = DecKeyExpansion(key)
-    print("Round Key (Decrypt):")
+    print("Round Keys (Decrypt):")
     for i in range(len(roundkeys)):
-        print(" Round {0:0>2}: ".format(i+1), end = '')
+        if i != len(roundkeys) - 1:
+            print(" Round {0:0>2}: ".format(i+1), end='')
+        else:
+            print("         : ", end='')
         printBlock(roundkeys[i])
     print("Decryption Starts:")
     p = cipher(c, roundkeys, True)
