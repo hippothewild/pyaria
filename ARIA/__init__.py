@@ -20,6 +20,9 @@ def byte_to_int(byte):
     return n
 
 def toggleprint():
+    """
+    Function that toggles whether print each round's result or not
+    """
     global printIntermediate
     printIntermediate = not printIntermediate
     if printIntermediate:
@@ -39,10 +42,11 @@ def ARIA_encryption(plain, key, bits):
     if key_len > bits//4:
         print("Key should be {0:}bits!".format(bits))
         return
+    # Change integer to byte array
     byte_plain = int_to_byte(plain, 16)
     byte_key = int_to_byte(key, bits//8)
-    byte_roundkeys = ARIA.KeyExpansion(byte_key)
-    byte_cipher = ARIA.cipher(byte_plain, byte_roundkeys, printIntermediate)
+    byte_roundkeys = ARIA.KeyExpansion(byte_key)  # Round key generation
+    byte_cipher = ARIA.cipher(byte_plain, byte_roundkeys, printIntermediate)  # Encryption
     return byte_to_int(byte_cipher)
 
 def ARIA_decryption(cipher, key, bits):
@@ -57,8 +61,9 @@ def ARIA_decryption(cipher, key, bits):
     if key_len > bits//4:
         print("Key should be {0:}bits!".format(bits))
         return
+    # Change integer to byte array
     byte_cipher = int_to_byte(c, 16)
     byte_key = int_to_byte(key, bits//8)
-    byte_roundkeys = ARIA.DecKeyExpansion(byte_key)
-    byte_plain = ARIA.cipher(byte_cipher, byte_roundkeys, printIntermediate)
+    byte_roundkeys = ARIA.DecKeyExpansion(byte_key)  # Round key generation
+    byte_plain = ARIA.cipher(byte_cipher, byte_roundkeys, printIntermediate)  # Decryption
     return byte_to_int(byte_plain)

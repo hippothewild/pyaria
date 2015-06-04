@@ -74,9 +74,9 @@ def inv_S2box(pos):
 
 def RotXOR(s, n, target):
     """
-    Input: 16 byte array s, integer n, 16 byte array target
-    Output: 16 byte array which is result of operation
-    Right-rotate s by n bits and XOR with target and return the result
+    Input: Byte array 's' of size 16, integer 'n', Byte array 'target' of size 16
+    Output: Byte array of size 16 which is result of operation
+    Right-rotate 's' by 'n' bits and XOR with 'target' then return the result
     """
     q = n//8
     n %= 8
@@ -88,9 +88,9 @@ def RotXOR(s, n, target):
 
 def DiffLayer(i):
     """
-    Input: 16 byte array i
-    Output: 16 byte array which is diffusion of i
-    Diffusion i and return it
+    Input: Byte array 'i' of size 16
+    Output: Byte array of size 16 which is diffusion of 'i'
+    Diffuse 'i' and return it
     """
     o = [0] * 16
     T = i[ 3] ^ i[ 4] ^ i[ 9] ^ i[14]
@@ -117,9 +117,9 @@ def DiffLayer(i):
 
 def KeyExpansion(key):
     """
-    Input: 16/24/32 byte array key
-    Output: array of 16 byte arrays which of size 13/15/17
-    Generate round keys
+    Input: Byte array 'key' of size 16/24/32
+    Output: 13/15/17 size array of byte arrays each of size 16
+    Generate encryption round keys
     """
     C = [[0x51, 0x7c, 0xc1, 0xb7, 0x27, 0x22, 0x0a, 0x94, 0xfe, 0x13, 0xab, 0xe8, 0xfa, 0x9a, 0x6e, 0xe0],
          [0x6d, 0xb1, 0x4a, 0xcc, 0x9e, 0x21, 0xc8, 0x20, 0xff, 0x28, 0xb1, 0xd5, 0xef, 0x5d, 0xe2, 0xb0],
@@ -186,6 +186,11 @@ def KeyExpansion(key):
     return roundkeys
 
 def DecKeyExpansion(key):
+    """
+    Input: Byte array 'key' of size 16/24/32
+    Output: 13/15/17 size array of byte arrays each of size 16
+    Generate decryption round keys
+    """
     R = len(key)//4 + 8
     roundkeys = KeyExpansion(key)
     t = [0]*16
@@ -199,25 +204,35 @@ def DecKeyExpansion(key):
     return roundkeys
 
 def cipher(plain, roundkeys, printInter):
+    """
+    Input: Byte array 'plain' of size 16, 13/15/17 size array 'roundkeys' of byte arrays each of size 16,
+           boolean 'printInter'
+    Output: Byte array of size 16, which is result of running SPN using 'plain' and 'roundkeys'
+    Run SPN using 'plain' and 'roundkeys' then return the result.
+    Since encryption/decryption of ARIA uses same SPN structure, it depends on roundkeys to determine
+    whether process is encryption or decryption.
+    """
     c = plain[:]
     t = [0]*16
     R = len(roundkeys)-1
     for i in range(R//2):
-        for j in range(4):
+        # Odd case
+        for j in range(4):  # AddRoundKey and SubstLayer
             t[ 4*j   ] = S1box( roundkeys[ 2*i ][ 4*j   ] ^ c[ 4*j   ] )
             t[ 4*j+1 ] = S2box( roundkeys[ 2*i ][ 4*j+1 ] ^ c[ 4*j+1 ] )
             t[ 4*j+2 ] = inv_S1box( roundkeys[ 2*i ][ 4*j+2 ] ^ c[ 4*j+2 ] )
             t[ 4*j+3 ] = inv_S2box( roundkeys[ 2*i ][ 4*j+3 ] ^ c[ 4*j+3 ] )
-        c = DiffLayer(t)
+        c = DiffLayer(t)  # DiffLayer
         if printInter:
             print(" Round {0:0>2}: ".format(2*i+1), end='')
             printBlock(c)
-        for j in range(4):
+        # Even case
+        for j in range(4):  # AddRoundKey and SubstLayer
             t[ 4*j   ] = inv_S1box( roundkeys[ 2*i+1 ][ 4*j   ] ^ c[ 4*j   ] )
             t[ 4*j+1 ] = inv_S2box( roundkeys[ 2*i+1 ][ 4*j+1 ] ^ c[ 4*j+1 ] )
             t[ 4*j+2 ] = S1box( roundkeys[ 2*i+1 ][ 4*j+2 ] ^ c[ 4*j+2 ] )
             t[ 4*j+3 ] = S2box( roundkeys[ 2*i+1 ][ 4*j+3 ] ^ c[ 4*j+3 ] )
-        c = DiffLayer(t)
+        c = DiffLayer(t)  # DiffLayer
         if 2*i+1 != R-1 and printInter:
             print(" Round {0:0>2}: ".format(2*i+2), end='')
             printBlock(c)
@@ -229,6 +244,12 @@ def cipher(plain, roundkeys, printInter):
     return c
 
 def printBlock(s, end='\n'):
+    """
+    Input: Byte array 's' of size 16, string 'end'
+    Output: None
+    Print the byte array 's' in nice hex format. Between each bytes, it has a space.
+    After printing all of bytes in 's', print 'end' at end of it.
+    """
     for byte in s:
         print("0"*[0,1][byte<16]+hex(byte)[2:], end=' ')
     print(end, end='')
@@ -242,7 +263,7 @@ def main():
     printBlock(key)
     print("Plain Text: ", end='')
     printBlock(plain)
-    roundkeys = KeyExpansion(key)
+    roundkeys = KeyExpansion(key)  # Encryption key generation
     print("Round Keys (Encrypt):")
     for i in range(len(roundkeys)):
         if i != len(roundkeys) - 1:
@@ -251,7 +272,7 @@ def main():
             print("         : ", end='')
         printBlock(roundkeys[i])
     print("Encryption Starts:")
-    c = cipher(plain, roundkeys, True)
+    c = cipher(plain, roundkeys, True)  # Encryption
     print("Cipher Text: ", end='')
     printBlock(c)
     print()
@@ -259,7 +280,7 @@ def main():
     printBlock(key)
     print("Cipher Text: ", end='')
     printBlock(c)
-    roundkeys = DecKeyExpansion(key)
+    roundkeys = DecKeyExpansion(key)  # Decryption key generation
     print("Round Keys (Decrypt):")
     for i in range(len(roundkeys)):
         if i != len(roundkeys) - 1:
@@ -268,7 +289,7 @@ def main():
             print("         : ", end='')
         printBlock(roundkeys[i])
     print("Decryption Starts:")
-    p = cipher(c, roundkeys, True)
+    p = cipher(c, roundkeys, True)  # Decryption
     print("Plain Text: ", end='')
     printBlock(p)
     
