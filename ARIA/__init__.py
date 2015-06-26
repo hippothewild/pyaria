@@ -62,7 +62,7 @@ def ARIA_decryption(cipher, key, bits):
         print("Key should be {0:}bits!".format(bits))
         return
     # Change integer to byte array
-    byte_cipher = int_to_byte(c, 16)
+    byte_cipher = int_to_byte(cipher, 16)
     byte_key = int_to_byte(key, bits//8)
     byte_roundkeys = ARIA.DecKeyExpansion(byte_key)  # Round key generation
     byte_plain = ARIA.cipher(byte_cipher, byte_roundkeys, printIntermediate)  # Decryption
